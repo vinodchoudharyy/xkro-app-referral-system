@@ -67,9 +67,10 @@
   </div>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
+    let refCode = urlParams.get('ref');
     
     if (refCode) {
+      refCode = refCode.toUpperCase().trim();
       document.getElementById('refBanner').style.display = 'block';
       document.getElementById('refName').textContent = refCode;
     }
@@ -79,7 +80,10 @@
     }
 
     function getUsers() { return JSON.parse(localStorage.getItem('xkro_users') || '[]'); }
-    function saveUsers(users) { localStorage.setItem('xkro_users', JSON.stringify(users)); }
+    function saveUsers(users) { 
+      localStorage.setItem('xkro_users', JSON.stringify(users));
+      console.log('Saved users:', users);
+    }
 
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -91,7 +95,11 @@
       btn.textContent = 'Creating account...';
 
       setTimeout(() => {
-        const users = getUsers();
+        // Get ALL users from localStorage
+        let users = getUsers();
+        
+        console.log('All existing users:', users);
+        console.log('Looking for refCode:', refCode);
         
         if (users.find(u => u.email === email)) {
           alert('Email already exists');
@@ -103,26 +111,28 @@
         let walletBalance = 0;
         let referredBy = null;
 
-        // Save referrer code before logging
-        let referrerCode = refCode ? refCode.toUpperCase() : null;
-        
-        // Show debug info
-        alert('DEBUG: refCode = ' + referrerCode + '\nAll users: ' + users.map(u => u.referralCode).join(', '));
-        
-        if (referrerCode) {
-          const referrer = users.find(u => u.referralCode === referrerCode);
-          console.log('Searching for:', referrerCode);
-          console.log('All codes:', users.map(u => u.referralCode));
-          if (referrer) {
-            referredBy = referrerCode;
-            referrer.referralCount += 1;
-            referrer.walletBalance += 10;
+        // Find referrer
+        if (refCode) {
+          console.log('Searching for referrer with code:', refCode);
+          console.log('Available codes:', users.map(u => u.referralCode));
+          
+          let referrerIndex = users.findIndex(u => u.referralCode === refCode);
+          console.log('Referrer index:', referrerIndex);
+          
+          if (referrerIndex !== -1) {
+            // Update referrer - add wallet balance first!
+            users[referrerIndex].walletBalance += 10;
+            users[referrerIndex].referralCount += 1;
+            referredBy = refCode;
+            
+            alert('REFERRER FOUND! Giving ₹10 to: ' + users[referrerIndex].name);
             walletBalance = 10;
-            saveUsers(users);
-            alert('SUCCESS! Referrer ' + referrer.name + ' got +₹10!');
           } else {
-            alert('ERROR: Referrer not found with code: ' + referrerCode);
+            console.log('Referrer not found - creating new as first user');
           }
+          
+          // Save updated users array
+          saveUsers(users);
         }
 
         const newUser = {
@@ -136,15 +146,14 @@
           walletBalance: walletBalance,
           createdAt: new Date().toISOString()
         };
-        
-        console.log('New user created:', newUser);
-        console.log('Referred by:', referredBy);
+
+        console.log('New user to add:', newUser);
 
         users.push(newUser);
         saveUsers(users);
         localStorage.setItem('xkro_current', JSON.stringify(newUser));
 
-        alert('🎉 Account created!' + (refCode ? ' You got ₹10 bonus!' : ''));
+        alert('🎉 Account created!\nYour Wallet: ₹' + walletBalance + '\nReferrer: ' + (referredBy || 'None'));
         window.location.href = 'dashboard.html';
       }, 500);
     });
