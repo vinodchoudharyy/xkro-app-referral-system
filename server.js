@@ -147,8 +147,25 @@ app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'signup.html'));
 });
 
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+app.get('/dashboard', async (req, res) => {
+  const ref = req.query.ref;
+  const name = req.query.name;
+  
+  if (ref && name) {
+    let user = await User.findOne({ referralCode: ref });
+    if (!user) {
+      user = new User({
+        name: name,
+        email: ref.toLowerCase() + '@demo.com',
+        password: 'demo123',
+        referralCode: ref
+      });
+      await user.save();
+    }
+    res.json({ user: { name: user.name, email: user.email, referralCode: user.referralCode, referralCount: user.referralCount, walletBalance: user.walletBalance } });
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  }
 });
 
 app.listen(PORT, () => {
