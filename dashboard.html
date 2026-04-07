@@ -139,6 +139,14 @@
 
     let user = JSON.parse(localStorage.getItem('xkro_current'));
     if (!user) { window.location.href = 'index.html'; }
+    
+    // Get fresh user data from localStorage
+    const allUsers = getUsers();
+    const freshUser = allUsers.find(u => u.id === user.id);
+    if (freshUser) {
+      user = freshUser;
+      localStorage.setItem('xkro_current', JSON.stringify(user));
+    }
 
     const BASE_URL = window.location.origin + window.location.pathname.replace(/dashboard\.html$/, '');
     document.getElementById('userName').textContent = user.name;
@@ -151,6 +159,13 @@
     document.getElementById('profileEmail').textContent = user.email;
 
     function toggleProfile() { document.getElementById('profileDropdown').classList.toggle('show'); }
+    
+    function refreshData() {
+      location.reload();
+    }
+    
+    // Auto refresh every 5 seconds
+    setInterval(refreshData, 5000);
     document.addEventListener('click', function(e) { if (!e.target.closest('.profile-menu')) document.getElementById('profileDropdown').classList.remove('show'); });
 
     function loadReferrals() {
