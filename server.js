@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/xkro';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/xkro';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
