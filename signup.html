@@ -105,12 +105,15 @@
 
         if (refCode) {
           const referrer = users.find(u => u.referralCode === refCode);
+          console.log('Referrer found:', referrer);
+          console.log('Ref code:', refCode);
           if (referrer) {
             referredBy = refCode;
             referrer.referralCount += 1;
             referrer.walletBalance += 10;
             walletBalance = 10;
             saveUsers(users);
+            alert('Referrer ' + referrer.name + ' got +₹10!');
           }
         }
 
@@ -125,6 +128,9 @@
           walletBalance: walletBalance,
           createdAt: new Date().toISOString()
         };
+        
+        console.log('New user created:', newUser);
+        console.log('Referred by:', referredBy);
 
         users.push(newUser);
         saveUsers(users);
