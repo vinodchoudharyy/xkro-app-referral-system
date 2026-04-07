@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#667eea">
+  <title>XKRO - Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body { background: linear-gradient(160deg, #1e1e2f 0%, #2d2d44 50%, #1e1e2f 100%); min-height: 100vh; display: block; padding: 20px; }
+    .app-container { width: 100%; max-width: 380px; margin: 0 auto; background: #252538; border-radius: 28px; box-shadow: 0 25px 80px rgba(0,0,0,0.5); overflow: hidden; }
+    .app-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 35px 25px 30px; text-align: center; border-radius: 0 0 40px 40px; position: relative; }
+    .app-header::after { content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 60px; height: 40px; background: #252538; border-radius: 0 0 20px 20px; }
+    .app-icon { width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 22px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .app-title { color: #fff; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .app-subtitle { color: rgba(255,255,255,0.7); font-size: 13px; }
+    .ref-banner { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 14px 18px; border-radius: 14px; margin: -8px 25px 20px; text-align: center; font-size: 13px; display: none; }
+    .ref-banner span { font-weight: 700; }
+    .app-body { padding: 5px 25px 30px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; padding: 16px 18px; background: #1e1e2f; border: 2px solid #3d3d56; border-radius: 14px; font-size: 15px; color: #fff; transition: all 0.3s; }
+    .form-input::placeholder { color: rgba(255,255,255,0.3); }
+    .form-input:focus { outline: none; border-color: #667eea; background: #1a1a2e; }
+    .btn-primary { width: 100%; padding: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: all 0.3s; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.6; }
+    .app-footer { text-align: center; padding-top: 18px; color: rgba(255,255,255,0.5); font-size: 13px; }
+    .app-footer a { color: #667eea; text-decoration: none; font-weight: 600; }
+    .bonus-badge { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; margin-bottom: 20px; }
+    .bonus-badge span { color: #38ef7d; font-weight: 600; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="app-header">
+      <div class="app-icon">🚀</div>
+      <h1 class="app-title">Join XKRO</h1>
+      <p class="app-subtitle">Start referring & earning</p>
+    </div>
+    <div id="refBanner" class="ref-banner" style="display: none;">
+      🎉 Referred by <span id="refName"></span> • You get ₹10 bonus!
+    </div>
+    <div class="app-body">
+      <div class="bonus-badge">
+        <span>🎁</span> <span>Get ₹10 on signup!</span>
+      </div>
+      <form id="signupForm">
+        <div class="form-group">
+          <label class="form-label">FULL NAME</label>
+          <input type="text" class="form-input" id="name" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMAIL</label>
+          <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input type="password" class="form-input" id="password" placeholder="Create a password" required>
+        </div>
+        <button type="submit" class="btn-primary" id="submitBtn">Create Account</button>
+      </form>
+      <p class="app-footer">Already have an account? <a href="index.html">Sign In</a></p>
+    </div>
+  </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    
+    if (refCode) {
+      document.getElementById('refBanner').style.display = 'block';
+      document.getElementById('refName').textContent = refCode;
+    }
+
+    function generateReferralCode(name) {
+      return name.substring(0, 4).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    function getUsers() { return JSON.parse(localStorage.getItem('xkro_users') || '[]'); }
+    function saveUsers(users) { localStorage.setItem('xkro_users', JSON.stringify(users)); }
+
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      setTimeout(() => {
+        const users = getUsers();
+        
+        if (users.find(u => u.email === email)) {
+          alert('Email already exists');
+          btn.disabled = false;
+          btn.textContent = 'Create Account';
+          return;
+        }
+
+        let walletBalance = 0;
+        let referredBy = null;
+
+        if (refCode) {
+          const referrer = users.find(u => u.referralCode === refCode);
+          if (referrer) {
+            referredBy = refCode;
+            referrer.referralCount += 1;
+            referrer.walletBalance += 10;
+            walletBalance = 10;
+            saveUsers(users);
+          }
+        }
+
+        const newUser = {
+          id: Date.now(),
+          name: name,
+          email: email,
+          password: password,
+          referralCode: generateReferralCode(name),
+          referredBy: referredBy,
+          referralCount: 0,
+          walletBalance: walletBalance,
+          createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        saveUsers(users);
+        localStorage.setItem('xkro_current', JSON.stringify(newUser));
+
+        alert('🎉 Account created!' + (refCode ? ' You got ₹10 bonus!' : ''));
+        window.location.href = 'dashboard.html';
+      }, 500);
+    });
+  </script>
+</body>
+</html>
