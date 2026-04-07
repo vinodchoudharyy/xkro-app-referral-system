@@ -103,17 +103,25 @@
         let walletBalance = 0;
         let referredBy = null;
 
-        if (refCode) {
-          const referrer = users.find(u => u.referralCode === refCode);
-          console.log('Referrer found:', referrer);
-          console.log('Ref code:', refCode);
+        // Save referrer code before logging
+        let referrerCode = refCode ? refCode.toUpperCase() : null;
+        
+        // Show debug info
+        alert('DEBUG: refCode = ' + referrerCode + '\nAll users: ' + users.map(u => u.referralCode).join(', '));
+        
+        if (referrerCode) {
+          const referrer = users.find(u => u.referralCode === referrerCode);
+          console.log('Searching for:', referrerCode);
+          console.log('All codes:', users.map(u => u.referralCode));
           if (referrer) {
-            referredBy = refCode;
+            referredBy = referrerCode;
             referrer.referralCount += 1;
             referrer.walletBalance += 10;
             walletBalance = 10;
             saveUsers(users);
-            alert('Referrer ' + referrer.name + ' got +₹10!');
+            alert('SUCCESS! Referrer ' + referrer.name + ' got +₹10!');
+          } else {
+            alert('ERROR: Referrer not found with code: ' + referrerCode);
           }
         }
 
